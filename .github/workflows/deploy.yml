@@ -1,0 +1,77 @@
+name: Build and Deploy to Hostinger
+
+# DISABLED - Using Hostinger Git auto-deploy instead
+# To re-enable, change 'workflow_dispatch' back to 'push'
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_API_URL: /api
+          NEXT_PUBLIC_BACKEND_URL: ''
+          NEXT_PUBLIC_SITE_URL: https://new.vaswaniindustries.com
+
+      - name: Deploy to Hostinger via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.224.138.28
+          username: u374384555
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: 65002
+          script: |
+            export PATH=/opt/alt/alt-nodejs20/root/bin:$PATH
+            cd ~/domains/new.vaswaniindustries.com
+            git pull origin main
+
+      - name: Upload standalone build via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 185.224.138.28
+          username: u374384555
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: 65002
+          source: ".next/"
+          target: "~/domains/new.vaswaniindustries.com/"
+          overwrite: true
+
+      - name: Restart app with PM2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: 185.224.138.28
+          username: u374384555
+          password: ${{ secrets.HOSTINGER_SSH_PASSWORD }}
+          port: 65002
+          script: |
+            export PATH=/opt/alt/alt-nodejs20/root/bin:$PATH
+            cd ~/domains/new.vaswaniindustries.com
+            
+            # Install PM2 globally if not present
+            npm list -g pm2 || npm install -g pm2
+            
+            # Stop existing process if running
+            pm2 delete vaswani 2>/dev/null || true
+            
+            # Start with PM2 (auto-restart on crash, memory limit)
+            pm2 start node --name "vaswani" -- .next/standalone/server.js
+            
+            # Save PM2 process list for auto-start
+            pm2 save

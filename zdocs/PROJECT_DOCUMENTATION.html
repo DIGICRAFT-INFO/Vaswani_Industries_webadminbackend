@@ -1,0 +1,343 @@
+w<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vaswani Industries — Project Documentation</title>
+<style>
+@page { margin: 1.5cm; size: A4; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; color: #1a1a1a; line-height: 1.7; font-size: 11pt; padding: 40px; max-width: 900px; margin: 0 auto; }
+h1 { font-size: 28pt; color: #0d9488; margin-bottom: 5px; border-bottom: 3px solid #0d9488; padding-bottom: 10px; }
+h2 { font-size: 16pt; color: #1a2b3b; margin-top: 35px; margin-bottom: 12px; border-left: 4px solid #0d9488; padding-left: 12px; page-break-after: avoid; }
+h3 { font-size: 12pt; color: #374151; margin-top: 20px; margin-bottom: 8px; }
+p { margin-bottom: 10px; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 10pt; }
+th { background: #0d9488; color: white; padding: 8px 12px; text-align: left; font-weight: 600; }
+td { padding: 7px 12px; border-bottom: 1px solid #e5e7eb; }
+tr:nth-child(even) td { background: #f9fafb; }
+.cover { text-align: center; padding: 80px 0; page-break-after: always; }
+.cover h1 { font-size: 36pt; border: none; }
+.cover .subtitle { font-size: 14pt; color: #6b7280; margin-top: 10px; }
+.cover .meta { margin-top: 40px; font-size: 11pt; color: #374151; }
+.badge { display: inline-block; background: #0d9488; color: white; padding: 2px 8px; border-radius: 4px; font-size: 9pt; font-weight: 600; }
+.section { page-break-inside: avoid; }
+code { background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 9.5pt; font-family: 'Consolas', monospace; }
+pre { background: #1a2b3b; color: #e5e7eb; padding: 15px; border-radius: 8px; font-size: 9pt; overflow-x: auto; margin: 12px 0; white-space: pre-wrap; }
+.highlight { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px 16px; border-radius: 8px; margin: 12px 0; }
+.footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 2px solid #e5e7eb; font-size: 9pt; color: #9ca3af; }
+ul { margin: 8px 0 12px 20px; }
+li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+<img src="https://www.equitybulls.com/equitybullsadmin/uploads/Vaswani%20Industries%20Limited%203.jpg" alt="Vaswani Industries" style="height:80px; margin-bottom:30px; border-radius:8px;">
+<h1>Website & CMS Platform</h1>
+<p class="subtitle">Complete Project Documentation</p>
+<p class="meta">
+<strong>Prepared for:</strong> Vaswani Industries Limited<br>
+<strong>Version:</strong> 1.0<br>
+<strong>Date:</strong> May 19, 2026<br>
+<strong>Domain:</strong> https://www.vaswaniindustries.com<br><br>
+<span class="badge">CONFIDENTIAL</span>
+</p>
+</div>
+
+<!-- 1. EXECUTIVE SUMMARY -->
+<h2>1. Executive Summary</h2>
+<p>This document presents the complete technical and functional overview of the Vaswani Industries Limited corporate website and Content Management System (CMS). The platform is a unified, modern web application serving both the public-facing corporate website and the internal admin management panel on a single deployment.</p>
+<div class="highlight">
+<strong>Key Highlights:</strong>
+<ul>
+<li>Single unified deployment (website + admin + API on one server)</li>
+<li>Real-time content management without developer intervention</li>
+<li>Mobile-responsive design for all devices (iOS, Android, Desktop)</li>
+<li>SEO-optimized for search engine visibility</li>
+<li>Secure admin panel with JWT authentication</li>
+<li>Hostinger VPS production-ready</li>
+</ul>
+</div>
+
+<!-- 2. TECHNOLOGY STACK -->
+<h2>2. Technology Stack</h2>
+<table>
+<tr><th>Component</th><th>Technology</th><th>Purpose</th></tr>
+<tr><td>Frontend</td><td>Next.js 16 (React)</td><td>Server-side rendered website</td></tr>
+<tr><td>Styling</td><td>Tailwind CSS 3.4</td><td>Responsive, modern UI</td></tr>
+<tr><td>Backend API</td><td>Express.js 4.19</td><td>REST API for all operations</td></tr>
+<tr><td>Database</td><td>MongoDB Atlas</td><td>Cloud-hosted data storage</td></tr>
+<tr><td>Authentication</td><td>JWT (JSON Web Tokens)</td><td>Secure admin access</td></tr>
+<tr><td>File Storage</td><td>Local (public/uploads/)</td><td>PDFs, images</td></tr>
+<tr><td>Animations</td><td>Framer Motion</td><td>Smooth page transitions</td></tr>
+<tr><td>Hosting</td><td>Hostinger VPS</td><td>Production server</td></tr>
+</table>
+
+<!-- 3. ARCHITECTURE -->
+<h2>3. Architecture Overview</h2>
+<pre>
+┌─────────────────────────────────────────────────────┐
+│              SINGLE SERVER (Port 3001)               │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────┐ │
+│  │   Website    │  │  Admin CMS   │  │  REST    │ │
+│  │  (Public)    │  │  (Protected) │  │  API     │ │
+│  │  Next.js     │  │  Next.js     │  │ Express  │ │
+│  └──────────────┘  └──────────────┘  └──────────┘ │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│              MongoDB Atlas (Cloud Database)          │
+└─────────────────────────────────────────────────────┘
+</pre>
+
+<!-- 4. WEBSITE PAGES -->
+<h2>4. Website Pages (Public)</h2>
+<h3>4.1 Homepage</h3>
+<ul>
+<li>Hero banner with dynamic content from CMS</li>
+<li>About section with company overview</li>
+<li>Products showcase (Sponge Iron, Billets, Power)</li>
+<li>Latest news slider with images</li>
+<li>Call-to-action buttons</li>
+</ul>
+
+<h3>4.2 About Us Section</h3>
+<table>
+<tr><th>Page</th><th>URL</th><th>Description</th></tr>
+<tr><td>The Company</td><td>/about/the-company</td><td>Company overview, culture, statistics</td></tr>
+<tr><td>Vision & Mission</td><td>/about/the-company#vision</td><td>Dynamic content from admin CMS</td></tr>
+<tr><td>Chairman's Message</td><td>/about/chairmans-message</td><td>Leadership message</td></tr>
+<tr><td>Board of Directors</td><td>/about/board-of-directors</td><td>Board member profiles</td></tr>
+<tr><td>Committees</td><td>/about/committees</td><td>Committee structure</td></tr>
+<tr><td>Familiarization Programme</td><td>/about/familiarization-programme</td><td>Director training</td></tr>
+</table>
+
+<h3>4.3 Products Section</h3>
+<table>
+<tr><th>Page</th><th>URL</th><th>Description</th></tr>
+<tr><td>Forging Ingots & Billets</td><td>/products/forging-ingots-and-billets</td><td>Specifications, sizes, grades</td></tr>
+<tr><td>Sponge Iron (DRI)</td><td>/products/sponge-iron</td><td>Process, chemical reactions, specs</td></tr>
+<tr><td>Power Generation</td><td>/products/power</td><td>Thermal + Solar energy details</td></tr>
+</table>
+
+<h3>4.4 Investors Section</h3>
+<table>
+<tr><th>Page</th><th>URL</th><th>Description</th></tr>
+<tr><td>Financials</td><td>/investors/financials</td><td>Annual reports, quarterly results</td></tr>
+<tr><td>Disclosures</td><td>/investors/disclosures</td><td>Corporate governance, returns</td></tr>
+<tr><td>Listing Information</td><td>/investors/listing-information</td><td>BSE listing details</td></tr>
+<tr><td>Policies</td><td>/investors/policies</td><td>Company policies</td></tr>
+<tr><td>SEBI Disclosure</td><td>/investors/sebi-disclosure</td><td>Regulatory filings</td></tr>
+<tr><td>Others</td><td>/investors/others</td><td>Miscellaneous documents</td></tr>
+</table>
+
+<h3>4.5 Other Pages</h3>
+<table>
+<tr><th>Page</th><th>URL</th><th>Description</th></tr>
+<tr><td>News & Media</td><td>/news</td><td>CSR activities, announcements</td></tr>
+<tr><td>Careers</td><td>/careers</td><td>Job listings, online applications</td></tr>
+<tr><td>Contact</td><td>/contact</td><td>Contact form, office addresses, Google Map</td></tr>
+</table>
+
+<!-- 5. ADMIN CMS -->
+<h2>5. Admin CMS Panel</h2>
+<p><strong>Access URL:</strong> https://www.vaswaniindustries.com/admin<br>
+<strong>Authentication:</strong> Email + Password (JWT secured, 7-day session)</p>
+
+<h3>5.1 Admin Modules</h3>
+<table>
+<tr><th>Module</th><th>Path</th><th>Capabilities</th></tr>
+<tr><td>Pages</td><td>/admin/pages</td><td>Edit all website page content (banners, sections, images, buttons)</td></tr>
+<tr><td>Documents</td><td>/admin/documents</td><td>Upload/manage PDFs (financials, disclosures, policies)</td></tr>
+<tr><td>News & Media</td><td>/admin/news</td><td>Create/edit/delete news articles with images</td></tr>
+<tr><td>Board Members</td><td>/admin/board-members</td><td>Manage director profiles and committees</td></tr>
+<tr><td>Products</td><td>/admin/products</td><td>Add/edit/delete product listings</td></tr>
+<tr><td>Careers</td><td>/admin/careers</td><td>Post jobs, view applications</td></tr>
+<tr><td>Contact Cards</td><td>/admin/contact-cards</td><td>Manage office contact information</td></tr>
+<tr><td>Contacts (Inbox)</td><td>/admin/contacts</td><td>View website enquiries, mark read, reply</td></tr>
+<tr><td>Notifications</td><td>/admin/notifications</td><td>System alerts for all activities</td></tr>
+<tr><td>System Settings</td><td>/admin/settings</td><td>Site name, phone, email, social links</td></tr>
+</table>
+
+<h3>5.2 Page Content Editor Features</h3>
+<ul>
+<li><strong>Mini Title</strong> — Small tag above heading</li>
+<li><strong>Main Title</strong> — Section heading</li>
+<li><strong>Subtitle</strong> — Supporting text</li>
+<li><strong>Paragraph</strong> — Body content (supports multiple paragraphs)</li>
+<li><strong>Images</strong> — Upload multiple images, auto-carousel when >1</li>
+<li><strong>Buttons</strong> — CTA with URL, style (primary/outline/dark), new tab option</li>
+<li><strong>Visibility Toggle</strong> — Show/hide any section instantly</li>
+</ul>
+
+<!-- 6. DOCUMENT MANAGEMENT -->
+<h2>6. Document Management System</h2>
+<h3>6.1 Folder Structure</h3>
+<pre>
+public/uploads/documents/
+├── financials_annual_reports/
+├── financials_quarterly_results/
+├── financials_related_party/
+├── disclosures_annual_return/
+├── disclosures_secretarial/
+├── disclosures_corporate_governance/
+├── disclosures_general_meetings/
+├── disclosures_newspaper/
+├── disclosures_others/
+├── disclosures_share_capital/
+├── disclosures_shareholding/
+├── listing_information/
+├── policies/
+├── sebi_disclosure/
+└── others/
+</pre>
+<h3>6.2 Features</h3>
+<ul>
+<li>Category-wise subfolder storage with unique ID filenames</li>
+<li>Year and quarter tagging for financial documents</li>
+<li>Download count tracking</li>
+<li>Active/inactive visibility toggle</li>
+<li>Search and filter by category</li>
+<li>Admin folder view showing physical file structure</li>
+</ul>
+
+<!-- 7. NOTIFICATIONS -->
+<h2>7. Notification System</h2>
+<table>
+<tr><th>Event</th><th>Notification Created</th></tr>
+<tr><td>New contact form submission</td><td>✅ "Contact: [Name]"</td></tr>
+<tr><td>New job application</td><td>✅ "New application for [Job Title]"</td></tr>
+<tr><td>Page content updated</td><td>✅ "Page content updated: [Section]"</td></tr>
+<tr><td>News article published</td><td>✅ "News published: [Title]"</td></tr>
+<tr><td>Document uploaded</td><td>✅ "Document uploaded: [Title]"</td></tr>
+<tr><td>Product added</td><td>✅ "Product added: [Name]"</td></tr>
+</table>
+
+<!-- 8. SECURITY -->
+<h2>8. Security Features</h2>
+<table>
+<tr><th>Feature</th><th>Implementation</th></tr>
+<tr><td>Authentication</td><td>JWT tokens with 7-day expiry</td></tr>
+<tr><td>Password Storage</td><td>bcrypt hashing (one-way encryption)</td></tr>
+<tr><td>API Protection</td><td>All admin routes require valid token</td></tr>
+<tr><td>Rate Limiting</td><td>express-rate-limit on sensitive endpoints</td></tr>
+<tr><td>HTTP Headers</td><td>Helmet.js security headers</td></tr>
+<tr><td>CORS</td><td>Same-origin policy enforced</td></tr>
+<tr><td>File Validation</td><td>PDF-only for documents, images-only for media</td></tr>
+<tr><td>Auto-logout</td><td>401 response triggers client-side logout</td></tr>
+<tr><td>X-Frame-Options</td><td>DENY (prevents clickjacking)</td></tr>
+</table>
+
+<!-- 9. SEO -->
+<h2>9. SEO & Performance</h2>
+<table>
+<tr><th>Feature</th><th>Status</th></tr>
+<tr><td>Server-Side Rendering</td><td>✅ All pages SSR for search engines</td></tr>
+<tr><td>Meta Tags</td><td>✅ Title, description, canonical on every page</td></tr>
+<tr><td>Open Graph</td><td>✅ Social media sharing optimized</td></tr>
+<tr><td>Clean URLs</td><td>✅ /about/the-company, /products/sponge-iron</td></tr>
+<tr><td>Responsive Design</td><td>✅ Mobile, tablet, desktop</td></tr>
+<tr><td>Fast Loading</td><td>✅ Tailwind CSS (minimal CSS bundle)</td></tr>
+<tr><td>Image Optimization</td><td>✅ Hostinger-compatible (no sharp dependency)</td></tr>
+</table>
+
+<!-- 10. RESPONSIVE -->
+<h2>10. Responsive Design</h2>
+<table>
+<tr><th>Device</th><th>Screen Size</th><th>Layout</th></tr>
+<tr><td>Mobile</td><td>&lt; 640px</td><td>Single column, hamburger menu, slide-in drawer</td></tr>
+<tr><td>Tablet</td><td>640px - 1024px</td><td>2-column grids, collapsible sidebar</td></tr>
+<tr><td>Desktop</td><td>&gt; 1024px</td><td>Full layout with sidebars, hover dropdowns</td></tr>
+</table>
+<p><strong>Tested on:</strong> Chrome, Firefox, Safari, Edge — Windows, macOS, iOS, Android</p>
+
+<!-- 11. DEPLOYMENT -->
+<h2>11. Deployment Guide (Hostinger VPS)</h2>
+<h3>11.1 Prerequisites</h3>
+<ul>
+<li>Hostinger VPS with Node.js 18+ support</li>
+<li>MongoDB Atlas connection (cloud database — already configured)</li>
+<li>Domain: www.vaswaniindustries.com pointed to VPS IP address</li>
+<li>SSL certificate (via Hostinger panel)</li>
+</ul>
+
+<h3>11.2 Deployment Steps</h3>
+<pre>
+1. Upload project files to VPS (via Git clone or SFTP)
+2. Rename .env.production → .env
+3. Install dependencies:
+   npm install --production
+4. Build the application:
+   npm run build
+5. Start with PM2 (process manager):
+   pm2 start server.js --name vaswani
+6. Configure Nginx reverse proxy:
+   proxy_pass http://localhost:3001
+7. Enable SSL via Hostinger panel
+8. Verify: https://www.vaswaniindustries.com
+</pre>
+
+<h3>11.3 Production Environment</h3>
+<table>
+<tr><th>Variable</th><th>Value</th></tr>
+<tr><td>PORT</td><td>3001</td></tr>
+<tr><td>NODE_ENV</td><td>production</td></tr>
+<tr><td>NEXT_PUBLIC_API_URL</td><td>https://www.vaswaniindustries.com/api</td></tr>
+<tr><td>NEXT_PUBLIC_BACKEND_URL</td><td>https://www.vaswaniindustries.com</td></tr>
+<tr><td>NEXT_PUBLIC_SITE_URL</td><td>https://www.vaswaniindustries.com</td></tr>
+<tr><td>STORAGE_MODE</td><td>local</td></tr>
+</table>
+
+<!-- 12. MAINTENANCE -->
+<h2>12. Maintenance & Support</h2>
+<h3>12.1 Regular Tasks</h3>
+<ul>
+<li>Monitor server health via /api/health endpoint</li>
+<li>Check notification panel for new enquiries daily</li>
+<li>Upload quarterly financial documents as per SEBI requirements</li>
+<li>Update news/CSR activities regularly</li>
+<li>Review and respond to contact form submissions</li>
+</ul>
+
+<h3>12.2 Content Updates (No Developer Needed)</h3>
+<p>All content updates can be done through the admin panel:</p>
+<ul>
+<li>Edit page text, images, and buttons</li>
+<li>Upload and manage investor documents</li>
+<li>Publish news articles with images</li>
+<li>Manage board member profiles</li>
+<li>Post job openings and view applications</li>
+<li>Update company contact information</li>
+</ul>
+
+<h3>12.3 Backup Strategy</h3>
+<ul>
+<li>MongoDB Atlas provides automatic daily backups (cloud)</li>
+<li>Uploaded files in /public/uploads/ — backup periodically via SFTP</li>
+</ul>
+
+<!-- 13. STATS -->
+<h2>13. Project Statistics</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Total Pages</td><td>30 (18 public + 12 admin)</td></tr>
+<tr><td>API Endpoints</td><td>30+</td></tr>
+<tr><td>Database Models</td><td>8 (User, News, Product, Document, Contact, PageContent, Notification, Settings)</td></tr>
+<tr><td>Production Dependencies</td><td>18 packages</td></tr>
+<tr><td>Build Time</td><td>~30 seconds</td></tr>
+<tr><td>Server Start Time</td><td>~3 seconds</td></tr>
+<tr><td>Supported Browsers</td><td>Chrome, Firefox, Safari, Edge</td></tr>
+<tr><td>Supported Devices</td><td>Mobile, Tablet, Desktop</td></tr>
+</table>
+
+<!-- FOOTER -->
+<div class="footer">
+<p><strong>© 2026 Vaswani Industries Limited. All Rights Reserved.</strong></p>
+<p>This document is confidential and intended for Vaswani Industries Limited management only.</p>
+<p>CIN: L27106CT1994PLC007401 | BSE Listed</p>
+</div>
+
+</body>
+</html>

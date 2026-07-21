@@ -1,0 +1,22 @@
+# Dependencies
+/node_modules
+
+# Next.js build output
+/.next/
+/out/
+
+# Production
+/build
+/env
+
+# Kiro IDE files
+/.kiro/
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
