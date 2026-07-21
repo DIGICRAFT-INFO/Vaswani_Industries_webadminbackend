@@ -38,11 +38,13 @@ export async function POST(request) {
     if (user.role !== 'admin' && user.role !== 'superadmin') return forbidden();
 
     const formData = await request.formData();
+    const category = formData.get('category') || 'Industrial';
     const data = {
       title: formData.get('title'),
       excerpt: formData.get('excerpt') || '',
       content: formData.get('content') || '',
-      category: formData.get('category') || 'Industrial',
+      category,
+      customCategory: category === 'Other' ? (formData.get('customCategory') || '') : '',
       author: formData.get('author') || 'Vaswani Industries',
       isPublished: formData.get('isPublished') !== 'false',
       uploadedBy: user._id,
@@ -50,15 +52,35 @@ export async function POST(request) {
 
     const tags = formData.get('tags');
     if (tags) {
-      data.tags = typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : [];
+      try { data.tags = JSON.parse(tags); } catch { data.tags = tags.split(',').map(t => t.trim()).filter(Boolean); }
     }
 
     const newItem = new News(data);
 
+    // Featured image
     const imageFile = formData.get('image');
     if (imageFile && imageFile.size > 0) {
       const saved = await saveUploadedFile(imageFile, 'images');
       newItem.image = saved.url;
+    }
+
+    // Additional images (multiple)
+    const additionalImages = [];
+    const addImgFiles = formData.getAll('additionalImages');
+    for (const file of addImgFiles) {
+      if (file && file.size > 0) {
+        const saved = await saveUploadedFile(file, 'images');
+        additionalImages.push(saved.url);
+      }
+    }
+    if (additionalImages.length > 0) newItem.additionalImages = additionalImages;
+
+    // PDF attachment
+    const pdfFile = formData.get('attachmentPdf');
+    if (pdfFile && pdfFile.size > 0) {
+      const saved = await saveUploadedFile(pdfFile, 'documents', 'news');
+      newItem.attachmentPdf = saved.url;
+      newItem.attachmentPdfName = pdfFile.name;
     }
 
     await newItem.save();

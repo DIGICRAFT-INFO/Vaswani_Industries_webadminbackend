@@ -41,24 +41,63 @@ export async function PUT(request, { params }) {
     const updateData = {};
 
     for (const [key, value] of formData.entries()) {
-      if (key !== 'image') updateData[key] = value;
+      if (!['image', 'additionalImages', 'attachmentPdf'].includes(key)) {
+        updateData[key] = value;
+      }
     }
 
     if (updateData.tags) {
-      updateData.tags = typeof updateData.tags === 'string'
-        ? updateData.tags.split(',').map(t => t.trim()).filter(Boolean)
-        : updateData.tags;
+      try { updateData.tags = JSON.parse(updateData.tags); } catch { updateData.tags = updateData.tags.split(',').map(t => t.trim()).filter(Boolean); }
     }
 
+    // customCategory
+    if (updateData.category !== 'Other') updateData.customCategory = '';
+
+    // Featured image
     const imageFile = formData.get('image');
     if (imageFile && imageFile.size > 0) {
-      // Delete old image
       if (item.image && item.image.includes('/uploads/images/')) {
         const oldFilename = item.image.split('/uploads/images/')[1];
         if (oldFilename) deleteFile(`/uploads/images/${oldFilename}`);
       }
       const saved = await saveUploadedFile(imageFile, 'images');
       updateData.image = saved.url;
+    }
+
+    // Additional images
+    const addImgFiles = formData.getAll('additionalImages');
+    const newAdditional = [];
+    for (const file of addImgFiles) {
+      if (file && file.size > 0) {
+        const saved = await saveUploadedFile(file, 'images');
+        newAdditional.push(saved.url);
+      }
+    }
+    if (newAdditional.length > 0) {
+      updateData.additionalImages = [...(item.additionalImages || []), ...newAdditional];
+    }
+
+    // Remove additional image if requested
+    const removeImg = formData.get('removeAdditionalImage');
+    if (removeImg) {
+      updateData.additionalImages = (item.additionalImages || []).filter(u => u !== removeImg);
+      deleteFile(removeImg);
+    }
+
+    // PDF attachment
+    const pdfFile = formData.get('attachmentPdf');
+    if (pdfFile && pdfFile.size > 0) {
+      if (item.attachmentPdf) deleteFile(item.attachmentPdf);
+      const saved = await saveUploadedFile(pdfFile, 'documents', 'news');
+      updateData.attachmentPdf = saved.url;
+      updateData.attachmentPdfName = pdfFile.name;
+    }
+
+    // Remove PDF if requested
+    if (formData.get('removePdf') === 'true') {
+      if (item.attachmentPdf) deleteFile(item.attachmentPdf);
+      updateData.attachmentPdf = '';
+      updateData.attachmentPdfName = '';
     }
 
     const updatedItem = await News.findByIdAndUpdate(idOrSlug, updateData, { new: true });
