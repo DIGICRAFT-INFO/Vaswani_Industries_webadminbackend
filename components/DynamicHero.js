@@ -1,7 +1,24 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight, Flame, Box, BatteryCharging, SunMedium } from 'lucide-react';
+import {
+  ChevronLeft, ChevronRight, ArrowRight,
+  Flame, Box, BatteryCharging, SunMedium,
+  Factory, Zap, Leaf, TrendingUp, Award, Users,
+  Building2, Cpu, Droplets, Wind, Star, Shield,
+} from 'lucide-react';
+
+// Icon map — name string → Lucide component
+const ICON_MAP = {
+  Flame, Box, BatteryCharging, SunMedium,
+  Factory, Zap, Leaf, TrendingUp, Award, Users,
+  Building2, Cpu, Droplets, Wind, Star, Shield,
+};
+
+function StatIcon({ name, size = 20 }) {
+  const Icon = ICON_MAP[name] || Flame;
+  return <Icon size={size} className="text-teal-400" />;
+}
 
 function ButtonRenderer({ buttons = [] }) {
   return (
@@ -120,23 +137,22 @@ export default function DynamicHero({ section, stats }) {
       <div className="absolute bottom-0 left-0 right-0 z-20">
         <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8 grid grid-cols-4 gap-2 sm:gap-4 md:gap-6 text-center">
           {(stats || [
-            { value: '90000', unit: 'MT', label: 'Production and Capacity of Sponge Iron' },
-            { value: '150000', unit: 'MT', label: 'Production and Capacity of Billets' },
-            { value: '11.5', unit: 'MW', label: 'Production and Capacity of Power' },
-            { value: '66.25', unit: 'MW', label: 'Production and Capacity of Solar' },
-          ]).map((stat, i) => {
-            const icons = [Flame, Box, BatteryCharging, SunMedium];
-            const Icon = icons[i % icons.length];
-            return (
-              <div key={i} className="flex flex-col items-center gap-1 sm:gap-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
-                  <Icon size={16} className="text-teal-400 sm:hidden" /><Icon size={20} className="text-teal-400 hidden sm:block" />
-                </div>
-                <div><span className="text-lg sm:text-2xl md:text-3xl font-black text-teal-400">{stat.value}</span><span className="text-[8px] sm:text-sm font-bold text-gray-400 ml-0.5">{stat.unit}</span></div>
-                <p className="text-[8px] sm:text-[11px] text-gray-400 font-medium leading-tight">{stat.label}</p>
+            { icon: 'Flame',          value: '90000',  unit: 'MT', label: 'Production and Capacity of Sponge Iron' },
+            { icon: 'Box',            value: '150000', unit: 'MT', label: 'Production and Capacity of Billets' },
+            { icon: 'BatteryCharging',value: '11.5',   unit: 'MW', label: 'Production and Capacity of Power' },
+            { icon: 'SunMedium',      value: '66.25',  unit: 'MW', label: 'Production and Capacity of Solar' },
+          ]).map((stat, i) => (
+            <div key={i} className="flex flex-col items-center gap-1 sm:gap-2">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
+                <StatIcon name={stat.icon} size={16} />
               </div>
-            );
-          })}
+              <div>
+                <span className="text-lg sm:text-2xl md:text-3xl font-black text-teal-400">{stat.value}</span>
+                <span className="text-[8px] sm:text-sm font-bold text-gray-400 ml-0.5">{stat.unit}</span>
+              </div>
+              <p className="text-[8px] sm:text-[11px] text-gray-400 font-medium leading-tight">{stat.label}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

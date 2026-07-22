@@ -14,17 +14,19 @@ const API = process.env.NEXT_PUBLIC_API_URL || '/api';
 async function getHomePage() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.BACKEND_URL || 'https://new.vaswaniindustries.com';
-    const [pageRes, newsRes, productsPageRes] = await Promise.allSettled([
+    const [pageRes, newsRes, productsPageRes, settingsRes] = await Promise.allSettled([
       fetch(`${baseUrl}/api/pages/home`, { cache: 'no-store' }),
       fetch(`${baseUrl}/api/news?limit=4`, { cache: 'no-store' }),
       fetch(`${baseUrl}/api/pages/products`, { cache: 'no-store' }),
+      fetch(`${baseUrl}/api/settings`, { cache: 'no-store' }),
     ]);
     return {
       page: pageRes.status === 'fulfilled' && pageRes.value.ok ? (await pageRes.value.json()).page : null,
       news: newsRes.status === 'fulfilled' && newsRes.value.ok ? (await newsRes.value.json()).news : [],
       productsPage: productsPageRes.status === 'fulfilled' && productsPageRes.value.ok ? (await productsPageRes.value.json()).page : null,
+      settings: settingsRes.status === 'fulfilled' && settingsRes.value.ok ? (await settingsRes.value.json()).settings : null,
     };
-  } catch { return { page: null, news: [], productsPage: null }; }
+  } catch { return { page: null, news: [], productsPage: null, settings: null }; }
 }
 
 function getSection(page, key) {
@@ -39,7 +41,7 @@ const STATS = [
 ];
 
 export default async function HomePage() {
-  const { page, news, productsPage } = await getHomePage();
+  const { page, news, productsPage, settings } = await getHomePage();
 
   const heroSection     = getSection(page, 'hero');
   const aboutSection    = getSection(page, 'about');
@@ -66,7 +68,7 @@ export default async function HomePage() {
   return (
     <>
       {/* ── HERO ── */}
-      <DynamicHero section={hero} stats={statsSection?.extra?.stats} />
+      <DynamicHero section={hero} stats={settings?.stats?.length > 0 ? settings.stats : statsSection?.extra?.stats} />
 
       {/* ── ABOUT SECTION ── */}
       <section className="py-16 md:py-24 bg-white" id="about">

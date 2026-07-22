@@ -112,6 +112,20 @@ const settingsSchema = new mongoose.Schema({
   sisterConcernUrl: { type: String, default: '#' },
   vision: { type: String, default: '' },
   mission: { type: String, default: '' },
+  stats: {
+    type: [{
+      icon:  { type: String, default: 'Flame' },
+      value: { type: String, default: '' },
+      unit:  { type: String, default: '' },
+      label: { type: String, default: '' },
+    }],
+    default: [
+      { icon: 'Flame',          value: '90000',  unit: 'MT', label: 'Production and Capacity of Sponge Iron' },
+      { icon: 'Box',            value: '150000', unit: 'MT', label: 'Production and Capacity of Billets' },
+      { icon: 'BatteryCharging',value: '11.5',   unit: 'MW', label: 'Production and Capacity of Power' },
+      { icon: 'SunMedium',      value: '66.25',  unit: 'MW', label: 'Production and Capacity of Solar' },
+    ],
+  },
 }, { timestamps: true });
 
 module.exports = {
