@@ -9,7 +9,7 @@ async function getNews(slug) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.BACKEND_URL || 'https://new.vaswaniindustries.com';
     const res = await fetch(`${baseUrl}/api/news/${slug}`, { 
-      next: { revalidate: 60 } 
+      next: { revalidate: 0 } 
     });
     if (!res.ok) return null;
     const data = await res.json();

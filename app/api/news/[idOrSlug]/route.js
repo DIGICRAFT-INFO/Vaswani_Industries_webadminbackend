@@ -64,7 +64,7 @@ export async function PUT(request, { params }) {
       updateData.image = saved.url;
     }
 
-    // Additional images
+    // Additional images — add new ones
     const addImgFiles = formData.getAll('additionalImages');
     const newAdditional = [];
     for (const file of addImgFiles) {
@@ -73,15 +73,23 @@ export async function PUT(request, { params }) {
         newAdditional.push(saved.url);
       }
     }
-    if (newAdditional.length > 0) {
-      updateData.additionalImages = [...(item.additionalImages || []), ...newAdditional];
-    }
 
-    // Remove additional image if requested
-    const removeImg = formData.get('removeAdditionalImage');
-    if (removeImg) {
-      updateData.additionalImages = (item.additionalImages || []).filter(u => u !== removeImg);
-      deleteFile(removeImg);
+    // Remove additional images if requested (supports multiple)
+    const removeImgs = formData.getAll('removeAdditionalImage');
+    let currentAddl = [...(item.additionalImages || [])];
+    if (removeImgs.length > 0) {
+      removeImgs.forEach(removeUrl => {
+        // Match both full URL and relative path
+        currentAddl = currentAddl.filter(u => {
+          const rel = u.includes('/uploads/') ? u.substring(u.indexOf('/uploads/')) : u;
+          const removeRel = removeUrl.includes('/uploads/') ? removeUrl.substring(removeUrl.indexOf('/uploads/')) : removeUrl;
+          return rel !== removeRel && u !== removeUrl;
+        });
+        deleteFile(removeUrl);
+      });
+      updateData.additionalImages = [...currentAddl, ...newAdditional];
+    } else if (newAdditional.length > 0) {
+      updateData.additionalImages = [...currentAddl, ...newAdditional];
     }
 
     // PDF attachment
