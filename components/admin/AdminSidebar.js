@@ -15,22 +15,21 @@ import {
 } from 'lucide-react';
 
 const NAV = [
-  { label: 'Overview', href: '/admin', icon: LayoutDashboard },
-  { label: 'Pages', href: '/admin/pages', icon: Layout },
-  { label: 'Documents', href: '/admin/documents', icon: FileText },
-  { label: 'News & Media', href: '/admin/news', icon: Newspaper },
-  { label: 'Board Members', href: '/admin/board-members', icon: Users },
-  // { label: 'Products', href: '/admin/products', icon: Package },
-  { label: 'Careers', href: '/admin/careers', icon: Briefcase },
-  { label: 'Contact Cards', href: '/admin/contact-cards', icon: MapPin },
-  { label: 'Contacts', href: '/admin/contacts', icon: MessageSquare },
-  { label: 'Notifications', href: '/admin/notifications', icon: Bell },
-  { label: 'System Settings', href: '/admin/settings', icon: Settings },
+  { label: 'Overview',       href: '/admin',               icon: LayoutDashboard, permission: 'overview' },
+  { label: 'Pages',          href: '/admin/pages',          icon: Layout,          permission: 'pages' },
+  { label: 'Documents',      href: '/admin/documents',      icon: FileText,        permission: 'documents' },
+  { label: 'News & Media',   href: '/admin/news',           icon: Newspaper,       permission: 'news' },
+  { label: 'Board Members',  href: '/admin/board-members',  icon: Users,           permission: 'board-members' },
+  { label: 'Careers',        href: '/admin/careers',        icon: Briefcase,       permission: 'careers' },
+  { label: 'Contact Cards',  href: '/admin/contact-cards',  icon: MapPin,          permission: 'contact-cards' },
+  { label: 'Contacts',       href: '/admin/contacts',       icon: MessageSquare,   permission: 'contacts' },
+  { label: 'Notifications',  href: '/admin/notifications',  icon: Bell,            permission: 'notifications' },
+  { label: 'System Settings',href: '/admin/settings',       icon: Settings,        permission: 'settings' },
 ];
 
 export default function AdminSidebar({ unreadNotifications = 0, unreadContacts = 0 }) {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileRef = useRef(null);
@@ -54,6 +53,9 @@ export default function AdminSidebar({ unreadNotifications = 0, unreadContacts =
     if (href === '/admin/contacts' && unreadContacts > 0) return unreadContacts;
     return null;
   };
+
+  // Filter nav items by permission
+  const visibleNav = NAV.filter(item => hasPermission(item.permission));
 
   return (
     <>
@@ -99,7 +101,7 @@ export default function AdminSidebar({ unreadNotifications = 0, unreadContacts =
         {/* NAVIGATION */}
         <nav className="flex-1 px-4 pt-20 lg:pt-2 pb-6 space-y-1 overflow-y-auto scrollbar-hide">
           <div className="px-3 mb-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest border-t border-zinc-800/50 pt-4">Main Menu</div>
-          {NAV.map(({ label, href, icon: Icon }) => {
+          {visibleNav.map(({ label, href, icon: Icon, permission }) => {
             const active = pathname === href || (href !== '/admin' && pathname.startsWith(href));
             const badge = getBadge(href);
             

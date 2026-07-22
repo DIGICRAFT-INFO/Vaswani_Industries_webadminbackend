@@ -21,10 +21,19 @@ export async function POST(request) {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return Response.json({ success: false, message: 'Invalid credentials' }, { status: 401 });
 
+    const permissions = user.getPermissions();
+
     return Response.json({
       success: true,
       token: generateToken(user._id),
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, avatar: user.avatar },
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        permissions,
+      },
     });
   } catch (err) {
     return Response.json({ success: false, message: err.message }, { status: 500 });
