@@ -4,19 +4,21 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import VaswaniBot from '@/components/admin/VaswaniBot';
-import { Bell, Menu, X } from 'lucide-react';
+import { Bell, Menu, X, User, LogOut, Settings, ExternalLink, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import adminApi from '@/lib/admin-api';
 
 export default function DashboardLayout({ children }) {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadNotif, setUnreadNotif] = useState(0);
   const [unreadContacts, setUnreadContacts] = useState(0);
   const [mounted, setMounted] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   
   const isFetching = useRef(false);
+  const userMenuRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
@@ -63,6 +65,15 @@ export default function DashboardLayout({ children }) {
   useEffect(() => {
     setSidebarOpen(false);
   }, [router.pathname]);
+
+  // Close user dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setShowUserMenu(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   if (!mounted || loading || !user) {
     return (
@@ -122,14 +133,54 @@ export default function DashboardLayout({ children }) {
 
             <div className="h-4 w-[1px] bg-zinc-200" />
 
-            <div className="flex items-center gap-3">
-              <div className="hidden md:block text-right">
-                <p className="text-xs font-bold text-zinc-900 leading-none mb-1">{user?.name}</p>
-                <p className="text-[10px] text-zinc-400 uppercase font-bold tracking-tighter">{user?.role}</p>
-              </div>
-              <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center text-white text-[13px] font-bold shadow-sm">
-                {user?.name?.charAt(0) || 'V'}
-              </div>
+            {/* Clickable user profile dropdown */}
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setShowUserMenu(v => !v)}
+                className="flex items-center gap-3 hover:bg-zinc-100 rounded-xl px-2.5 py-1.5 transition-all group"
+              >
+                <div className="hidden md:block text-right">
+                  <p className="text-xs font-bold text-zinc-900 leading-none mb-0.5">{user?.name}</p>
+                  <p className="text-[10px] text-zinc-400 uppercase font-bold tracking-tighter">{user?.role}</p>
+                </div>
+                <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center text-white text-[13px] font-bold shadow-sm group-hover:bg-teal-600 transition-colors">
+                  {user?.name?.charAt(0) || 'V'}
+                </div>
+                <ChevronDown size={13} className={`text-zinc-400 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-zinc-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in slide-in-from-top-2 duration-150">
+                  {/* User info header */}
+                  <div className="px-4 py-3 bg-zinc-50 border-b border-zinc-100">
+                    <p className="text-sm font-black text-zinc-900 truncate">{user?.name}</p>
+                    <p className="text-[11px] text-zinc-400 truncate">{user?.email}</p>
+                    <span className="inline-block mt-1 text-[9px] font-black uppercase tracking-widest bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">{user?.role}</span>
+                  </div>
+                  {/* Menu items */}
+                  <div className="p-1.5 space-y-0.5">
+                    <Link href="/admin/settings" onClick={() => setShowUserMenu(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors font-medium">
+                      <User size={15} className="text-zinc-400" /> My Profile
+                    </Link>
+                    <Link href="/admin/settings" onClick={() => setShowUserMenu(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors font-medium">
+                      <Settings size={15} className="text-zinc-400" /> Settings
+                    </Link>
+                    <Link href="/" target="_blank" onClick={() => setShowUserMenu(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 transition-colors font-medium">
+                      <ExternalLink size={15} className="text-zinc-400" /> Visit Website
+                    </Link>
+                    <div className="border-t border-zinc-100 mt-1 pt-1">
+                      <button onClick={() => { setShowUserMenu(false); logout(); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors font-bold">
+                        <LogOut size={15} /> Sign Out
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </header>
