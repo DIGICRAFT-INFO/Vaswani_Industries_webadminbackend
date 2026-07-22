@@ -1,6 +1,7 @@
 // news/[slug]/page.js
 
 import PageBanner from '@/components/PageBanner';
+import NewsImageLightbox from '@/components/NewsImageLightbox';
 import Link from 'next/link';
 import { Calendar, Eye, Tag, ArrowLeft } from 'lucide-react';
 
@@ -95,19 +96,16 @@ export default async function NewsDetailPage({ params }) {
            )}
         </div>
 
-        {/* Additional Images Gallery */}
+        {/* Additional Images Gallery with Lightbox */}
         {news.additionalImages?.length > 0 && (
           <div className="mt-10">
             <h2 className="text-lg font-bold text-gray-800 mb-4">More Photos</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {news.additionalImages.map((img, i) => {
-                const src = img.includes('/uploads/') ? img.substring(img.indexOf('/uploads/')) : img;
-                return (
-                  <img key={i} src={src} alt={`Photo ${i + 2}`}
-                    className="w-full h-48 object-cover rounded-2xl shadow-sm hover:shadow-md transition-shadow" />
-                );
-              })}
-            </div>
+            <NewsImageLightbox
+              images={news.additionalImages.map(img =>
+                img.includes('/uploads/') ? img.substring(img.indexOf('/uploads/')) : img
+              )}
+              title={news.title}
+            />
           </div>
         )}
 
