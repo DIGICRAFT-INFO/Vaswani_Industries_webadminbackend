@@ -102,6 +102,13 @@ function NewsModal({ item, onClose, onSuccess }) {
       fd.append('tags', JSON.stringify(form.tags.split(',').map(t => t.trim()).filter(Boolean)));
       if (imageFile) fd.append('image', imageFile);
       addlFiles.forEach(f => fd.append('additionalImages', f));
+      // Tell server which existing images were removed
+      const originalAddl = item?.additionalImages || [];
+      originalAddl.forEach(url => {
+        if (!existingAddl.includes(url) && !existingAddl.includes(url.includes('/uploads/') ? url.substring(url.indexOf('/uploads/')) : url)) {
+          fd.append('removeAdditionalImage', url);
+        }
+      });
       if (pdfFile) fd.append('attachmentPdf', pdfFile);
       if (removePdf) fd.append('removePdf', 'true');
       const cfg = { headers: { 'Content-Type': 'multipart/form-data' } };
@@ -183,7 +190,7 @@ function NewsModal({ item, onClose, onSuccess }) {
                 <div key={`ex-${i}`} className="relative w-20 h-20 rounded-xl overflow-hidden border border-gray-200 group">
                   <img src={url} alt="" className="w-full h-full object-cover" />
                   <button onClick={() => setExistingAddl(p => p.filter((_, j) => j !== i))}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 transition-opacity">
                     <X size={10} />
                   </button>
                 </div>
@@ -192,7 +199,7 @@ function NewsModal({ item, onClose, onSuccess }) {
               {addlPreviews.map((url, i) => (
                 <div key={`new-${i}`} className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-teal-300 group">
                   <img src={url} alt="" className="w-full h-full object-cover" />
-                  <button onClick={() => removeNewAddl(i)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"><X size={10} /></button>
+                  <button onClick={() => removeNewAddl(i)} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 transition-opacity"><X size={10} /></button>
                 </div>
               ))}
               {/* Add more button */}
