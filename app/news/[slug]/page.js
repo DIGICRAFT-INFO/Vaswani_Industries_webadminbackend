@@ -23,9 +23,7 @@ function normalizeImageUrl(url) {
 async function getNews(slug) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.BACKEND_URL || 'https://new.vaswaniindustries.com';
-    // Normalize slug — encode spaces properly for URL
-    const encodedSlug = encodeURIComponent(slug);
-    const res = await fetch(`${baseUrl}/api/news/${encodedSlug}`, { 
+    const res = await fetch(`${baseUrl}/api/news/${slug}`, { 
       next: { revalidate: 0 } 
     });
     if (!res.ok) return null;
