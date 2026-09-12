@@ -5,6 +5,21 @@ import NewsImageLightbox from '@/components/NewsImageLightbox';
 import Link from 'next/link';
 import { Calendar, Eye, Tag, ArrowLeft } from 'lucide-react';
 
+// Converts any stored /uploads/... URL to /api/files/... for persistent serving
+function normalizeImageUrl(url) {
+  if (!url) return '';
+  let rel = url;
+  if (url.startsWith('http')) {
+    try { rel = new URL(url).pathname; } catch {}
+  } else if (url.includes('/uploads/')) {
+    rel = url.substring(url.indexOf('/uploads/'));
+  } else if (url.includes('/investor/')) {
+    rel = url.substring(url.indexOf('/investor/'));
+  }
+  if (rel.startsWith('/uploads/')) return `/api/files${rel.slice('/uploads'.length)}`;
+  return rel;
+}
+
 async function getNews(slug) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.BACKEND_URL || 'https://new.vaswaniindustries.com';
@@ -78,7 +93,7 @@ export default async function NewsDetailPage({ params }) {
 
         {news.image && (
           <div className="mb-10">
-             <img src={news.image.includes('/uploads/') ? news.image.substring(news.image.indexOf('/uploads/')) : news.image} alt={news.title} className="w-full h-auto max-h-[500px] object-cover rounded-3xl shadow-lg" />
+             <img src={normalizeImageUrl(news.image)} alt={news.title} className="w-full h-auto max-h-[500px] object-cover rounded-3xl shadow-lg" />
           </div>
         )}
 
@@ -101,9 +116,7 @@ export default async function NewsDetailPage({ params }) {
           <div className="mt-10">
             <h2 className="text-lg font-bold text-gray-800 mb-4">More Photos</h2>
             <NewsImageLightbox
-              images={news.additionalImages.map(img =>
-                img.includes('/uploads/') ? img.substring(img.indexOf('/uploads/')) : img
-              )}
+              images={news.additionalImages.map(img => normalizeImageUrl(img))}
               title={news.title}
             />
           </div>
@@ -119,7 +132,7 @@ export default async function NewsDetailPage({ params }) {
               <p className="font-bold text-gray-800 text-sm">Attached Document</p>
               <p className="text-xs text-gray-500 truncate">{news.attachmentPdfName || 'Download PDF'}</p>
             </div>
-            <a href={news.attachmentPdf.includes('/uploads/') ? news.attachmentPdf.substring(news.attachmentPdf.indexOf('/uploads/')) : news.attachmentPdf}
+            <a href={normalizeImageUrl(news.attachmentPdf)}
               target="_blank" rel="noopener noreferrer"
               className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors flex-shrink-0">
               Download PDF
