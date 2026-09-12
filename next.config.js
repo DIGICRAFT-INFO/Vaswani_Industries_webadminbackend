@@ -24,6 +24,25 @@ const nextConfig = {
     NEXT_PUBLIC_SITE_URL:    process.env.NEXT_PUBLIC_SITE_URL    || '',
   },
 
+  async redirects() {
+    return [
+      // Redirect new. subdomain → main domain (301 permanent)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'new.vaswaniindustries.com' }],
+        destination: 'https://vaswaniindustries.com/:path*',
+        permanent: true,
+      },
+      // Redirect www. → non-www (301 permanent)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.vaswaniindustries.com' }],
+        destination: 'https://vaswaniindustries.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
