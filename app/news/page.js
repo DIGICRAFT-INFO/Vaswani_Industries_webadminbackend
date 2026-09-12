@@ -112,7 +112,7 @@ export default function NewsPage() {
                 {filtered.map(item => (
                   <Link 
                     key={item._id}
-                    href={`/news/${item.slug || item._id}`} 
+                    href={`/news/${encodeURIComponent(item.slug || item._id)}`} 
                     className="group bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                   >
                     {/* Image Box */}

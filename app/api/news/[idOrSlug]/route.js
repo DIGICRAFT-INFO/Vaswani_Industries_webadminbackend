@@ -11,8 +11,9 @@ export async function GET(request, { params }) {
     const { News } = require('../../../../models/index');
     const { idOrSlug } = await params;
 
-    // Normalize slug — replace spaces with hyphens, lowercase
-    const normalizedSlug = idOrSlug
+    // Decode URL encoding and normalize slug
+    const decoded = decodeURIComponent(idOrSlug);
+    const normalizedSlug = decoded
       .toLowerCase()
       .replace(/\s+/g, '-')
       .replace(/[^a-z0-9-]/g, '')
@@ -21,12 +22,14 @@ export async function GET(request, { params }) {
     let item = null;
     // Try MongoDB ObjectId first
     try { item = await News.findById(idOrSlug); } catch {}
-    // Exact slug match
+    // Exact slug match (original)
     if (!item) item = await News.findOne({ slug: idOrSlug });
-    // Normalized slug match (handles spaces in URL)
-    if (!item && normalizedSlug !== idOrSlug) item = await News.findOne({ slug: normalizedSlug });
-    // Partial/prefix match — slug starts with normalized (timestamp suffix cases)
-    if (!item) item = await News.findOne({ slug: { $regex: `^${normalizedSlug}`, $options: 'i' } });
+    // Decoded slug match
+    if (!item && decoded !== idOrSlug) item = await News.findOne({ slug: decoded });
+    // Normalized slug match (spaces → hyphens)
+    if (!item) item = await News.findOne({ slug: normalizedSlug });
+    // Prefix match — handles timestamp suffix in slug
+    if (!item) item = await News.findOne({ slug: { $regex: `^${normalizedSlug.replace(/[-]+$/, '')}`, $options: 'i' } });
 
     if (!item) return Response.json({ success: false, message: 'Article not found' }, { status: 404 });
 
