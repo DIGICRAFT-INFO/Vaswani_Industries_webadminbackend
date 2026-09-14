@@ -17,6 +17,12 @@ export async function GET(request) {
     const query = {};
     if (category && category !== 'All') query.category = category;
 
+    // Check if request comes from an authenticated admin — if so, show all articles.
+    // Otherwise only show published ones.
+    const user = await getAuthUser(request).catch(() => null);
+    const isAdmin = user && (user.role === 'admin' || user.role === 'superadmin');
+    if (!isAdmin) query.isPublished = true;
+
     const news = await News.find(query)
       .sort('-createdAt')
       .skip((page - 1) * limit)

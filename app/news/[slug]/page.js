@@ -1,22 +1,40 @@
 // news/[slug]/page.js
 
+import dbConnect from '@/lib/db';
 import PageBanner from '@/components/PageBanner';
 import NewsImageLightbox from '@/components/NewsImageLightbox';
 import Link from 'next/link';
 import { Calendar, Eye, Tag, ArrowLeft } from 'lucide-react';
 
+// Normalize any stored URL to a relative /uploads/... path
+function normalizeImg(url) {
+  if (!url) return null;
+  if (url.startsWith('/uploads/')) return url;
+  if (url.includes('/uploads/')) return url.substring(url.indexOf('/uploads/'));
+  return url;
+}
+
 async function getNews(slug) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.BACKEND_URL || 'https://new.vaswaniindustries.com';
-    const res = await fetch(`${baseUrl}/api/news/${slug}`, { 
-      next: { revalidate: 0 } 
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.news;
-  } catch (err) { 
-    console.error("Fetch Error:", err);
-    return null; 
+    await dbConnect();
+    const { News } = require('../../../models/index');
+
+    let item = null;
+    // Try by slug first, then by ObjectId
+    item = await News.findOne({ slug }).lean();
+    if (!item) {
+      try { item = await News.findById(slug).lean(); } catch {}
+    }
+    if (!item) return null;
+
+    // Increment views (fire-and-forget, don't block render)
+    News.findByIdAndUpdate(item._id, { $inc: { views: 1 } }).exec().catch(() => {});
+
+    // Convert ObjectId / Date fields so they're serialisable
+    return JSON.parse(JSON.stringify(item));
+  } catch (err) {
+    console.error('getNews error:', err);
+    return null;
   }
 }
 
@@ -78,7 +96,7 @@ export default async function NewsDetailPage({ params }) {
 
         {news.image && (
           <div className="mb-10">
-             <img src={news.image.includes('/uploads/') ? news.image.substring(news.image.indexOf('/uploads/')) : news.image} alt={news.title} className="w-full h-auto max-h-[500px] object-cover rounded-3xl shadow-lg" />
+             <img src={normalizeImg(news.image)} alt={news.title} className="w-full h-auto max-h-[500px] object-cover rounded-3xl shadow-lg" />
           </div>
         )}
 
@@ -101,9 +119,7 @@ export default async function NewsDetailPage({ params }) {
           <div className="mt-10">
             <h2 className="text-lg font-bold text-gray-800 mb-4">More Photos</h2>
             <NewsImageLightbox
-              images={news.additionalImages.map(img =>
-                img.includes('/uploads/') ? img.substring(img.indexOf('/uploads/')) : img
-              )}
+              images={news.additionalImages.map(img => normalizeImg(img)).filter(Boolean)}
               title={news.title}
             />
           </div>
@@ -119,7 +135,7 @@ export default async function NewsDetailPage({ params }) {
               <p className="font-bold text-gray-800 text-sm">Attached Document</p>
               <p className="text-xs text-gray-500 truncate">{news.attachmentPdfName || 'Download PDF'}</p>
             </div>
-            <a href={news.attachmentPdf.includes('/uploads/') ? news.attachmentPdf.substring(news.attachmentPdf.indexOf('/uploads/')) : news.attachmentPdf}
+            <a href={normalizeImg(news.attachmentPdf) || '#'}
               target="_blank" rel="noopener noreferrer"
               className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors flex-shrink-0">
               Download PDF
